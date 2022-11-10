@@ -20,7 +20,7 @@ class BasicWebServer {
 
   async _isRequestAuthorized(req) {
     // Add any authorization checks here
-    return false;
+    return true;
   }
 
   start() {

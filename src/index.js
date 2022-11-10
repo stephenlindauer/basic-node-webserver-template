@@ -1,4 +1,3 @@
-const Server = require("./Server");
+const BasicWebServer = require("./BasicWebServer");
 
-const s = new Server();
-s.start();
+new BasicWebServer().start();
