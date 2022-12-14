@@ -1,24 +1,26 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const session = require("express-session");
-const path = require("path");
-const cors = require("cors");
+import bodyParser from "body-parser";
+import cors from "cors";
+import express from "express";
+import path from "path";
+import session from "express-session";
 
 // Basic logging utility
-const _log = (level, tag, log) => console.log(`${level} [${tag}] ${log}`);
-const LOG = (s) => _log("I", TAG, s);
-const WARN = (s) => _log("W", TAG, s);
-const ERROR = (s) => _log("E", TAG, s);
+const _log = (level: string, tag: string, log: string) =>
+  console.log(`${level} [${tag}] ${log}`);
+const LOG = (s: string) => _log("I", TAG, s);
+const WARN = (s: string) => _log("W", TAG, s);
+const ERROR = (s: string) => _log("E", TAG, s);
 
 const TAG = "BasicWebServer";
-class BasicWebServer {
-  _app;
+export default class BasicWebServer {
+  _app?: express.Express;
+  _listeningPort: number;
 
-  constructor(port) {
+  constructor(port?: number) {
     this._listeningPort = port ?? 8080;
   }
 
-  async _isRequestAuthorized(req) {
+  async _isRequestAuthorized(req: express.Request) {
     // Add any authorization checks here
     return true;
   }
@@ -29,7 +31,7 @@ class BasicWebServer {
 
     // ******************
     // Add pages here
-    this._app.get("/", (req, res) => {
+    this._app?.get("/", (req, res) => {
       res.render("index", {
         // Example
         query: req.query,
@@ -43,14 +45,18 @@ class BasicWebServer {
     // End of pages setup
     // ******************
 
-    this._app.listen(this._listeningPort, () =>
+    this._app?.listen(this._listeningPort, () =>
       LOG(`Listening on port http://localhost:${this._listeningPort}`)
     );
   }
 
   // Probably don't need to modify anything below here unless looking for advanced customizations
 
-  async _middleware(req, res, next) {
+  async _middleware(
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) {
     if (!(await this._isRequestAuthorized(req))) {
       res.status(401).json({ status: "Unauthorized" });
       WARN("401 " + req.method + " " + req.originalUrl);
@@ -64,8 +70,8 @@ class BasicWebServer {
       LOG(
         `${res.statusCode} ${req.method} ${req.originalUrl} ${Date.now() - t}ms`
       );
-    } catch (e) {
-      ERROR("Request failed: " + e.message);
+    } catch (e: unknown) {
+      ERROR("Request failed: " + e);
     }
   }
 
@@ -94,5 +100,3 @@ class BasicWebServer {
     });
   }
 }
-
-module.exports = BasicWebServer;
